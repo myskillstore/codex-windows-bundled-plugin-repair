@@ -1,0 +1,49 @@
+---
+name: codex-windows-bundled-plugin-repair
+description: Diagnose and safely repair Codex Desktop on Windows when bundled Browser, Chrome, Computer Use, or other openai-bundled plugins disappear, fail to load, or break after an app update, runtime relocation, or CODEX_HOME junction/path mismatch. Do not use for ordinary third-party plugin installation or non-Windows systems.
+---
+
+# Codex Windows Bundled Plugin Repair
+
+Restore the current Codex Desktop bundle without resetting unrelated user state.
+
+## Non-negotiable gates
+
+- Start with read-only inspection. Run `scripts/Repair-CodexBundledPlugins.ps1 -InspectOnly` before proposing a mutation.
+- Treat the newest installed `OpenAI.Codex` AppX package as the source of truth for bundled plugins and runtime binaries.
+- Resolve both the lexical and canonical `CODEX_HOME` paths. A junction that resolves to another drive can make the reserved `openai-bundled` marketplace reject its own materialized source.
+- Never change ownership or ACLs under `WindowsApps`, delete the whole Codex data directory, or overwrite unrelated configuration.
+- Before any mutation, read [references/diagnosis-and-repair.md](references/diagnosis-and-repair.md). Back up only files that will change.
+- Obtain user authorization immediately before changing user environment variables, `config.toml`, runtime executables, registry entries, or running processes. A request to diagnose is not repair authorization.
+- Do not stop Codex automatically. If runtime files are locked, ask the user to fully exit Codex and run the repair command from PowerShell.
+
+## Workflow
+
+1. Run inspection and classify the failure:
+
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File "<skill-dir>\scripts\Repair-CodexBundledPlugins.ps1" -InspectOnly
+   ```
+
+2. Explain the evidence and choose only the required repair flags:
+
+   - `-RepairCodexHome`: persist the canonical Codex data path when an unset or junctioned path causes reserved-marketplace rejection.
+   - `-RepairMarketplaceSource`: repair only the `openai-bundled` marketplace source in `config.toml`; require a valid materialized marketplace.
+   - `-RepairRuntimeDrift`: copy only mismatched runtime files from the current AppX package and update related existing config/environment entries.
+   - `-RepairAll`: combine the three repairs after the user authorizes all of them.
+
+3. Restart Codex Desktop after a repair.
+
+4. Open a fresh task and verify that the Browser and Computer Use skills are present. When the user asks for an interaction test, use the Browser or Computer Use skill itself; otherwise keep verification read-only.
+
+## Interpretation
+
+Do not treat `plugin list` alone as proof of success. Require agreement between:
+
+- the canonical `CODEX_HOME` and the process/user environment;
+- the current AppX bundle and relocated runtime hashes;
+- the configured and expected materialized `openai-bundled` paths;
+- installed/enabled plugin state and the presence of required client scripts;
+- a fresh Codex task's actual skill/tool catalog.
+
+Read [references/failure-patterns.md](references/failure-patterns.md) when symptoms remain after the standard workflow or when logs contain reserved-marketplace, trust-hash, native-host, or runtime-startup errors.

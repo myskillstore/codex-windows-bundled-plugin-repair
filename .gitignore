@@ -1,0 +1,25 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.local.*
+config.json
+
+# Runtime and diagnostic artifacts
+backups/
+logs/
+*.log
+*.sqlite*
+*.tmp
+*.bak
+
+# Python and editor artifacts
+__pycache__/
+*.py[cod]
+.idea/
+.vscode/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

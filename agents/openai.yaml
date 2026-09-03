@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Windows Bundled Plugin Repair"
+  short_description: "Repair missing Codex bundled browser tools"
+  default_prompt: "Use $codex-windows-bundled-plugin-repair to diagnose and safely repair missing Browser, Chrome, or Computer Use plugins on Windows."
