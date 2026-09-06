@@ -1,6 +1,6 @@
 ---
 name: codex-windows-bundled-plugin-repair
-description: Diagnose and safely repair Codex Desktop on Windows when bundled Browser, Chrome, Computer Use, or other openai-bundled plugins disappear, fail to load, or break after an app update, runtime relocation, or CODEX_HOME junction/path mismatch. Do not use for ordinary third-party plugin installation or non-Windows systems.
+description: Diagnose and safely repair Codex Desktop on Windows when bundled Browser, Chrome, Computer Use, or other openai-bundled plugins disappear, fail to load, or break after an app update, runtime relocation, CODEX_HOME junction/path mismatch, or code-mode IPC schema mismatch. Do not use for ordinary third-party plugin installation or non-Windows systems.
 ---
 
 # Codex Windows Bundled Plugin Repair
@@ -11,6 +11,7 @@ Restore the current Codex Desktop bundle without resetting unrelated user state.
 
 - Start with read-only inspection. Run `scripts/Repair-CodexBundledPlugins.ps1 -InspectOnly` before proposing a mutation.
 - Treat the newest installed `OpenAI.Codex` AppX package as the source of truth for bundled plugins and runtime binaries.
+- Include `codex-code-mode-host.exe` in runtime drift checks. A stale copy can execute a command but fail while returning its result, for example with a missing `code_mode_host_duration_ns` field.
 - Resolve both the lexical and canonical `CODEX_HOME` paths. A junction that resolves to another drive can make the reserved `openai-bundled` marketplace reject its own materialized source.
 - Never change ownership or ACLs under `WindowsApps`, delete the whole Codex data directory, or overwrite unrelated configuration.
 - Before any mutation, read [references/diagnosis-and-repair.md](references/diagnosis-and-repair.md). Back up only files that will change.
@@ -42,6 +43,7 @@ Do not treat `plugin list` alone as proof of success. Require agreement between:
 
 - the canonical `CODEX_HOME` and the process/user environment;
 - the current AppX bundle and relocated runtime hashes;
+- the AppX and relocated `codex-code-mode-host.exe` hashes when command results fail IPC decoding;
 - the configured and expected materialized `openai-bundled` paths;
 - installed/enabled plugin state and the presence of required client scripts;
 - a fresh Codex task's actual skill/tool catalog.

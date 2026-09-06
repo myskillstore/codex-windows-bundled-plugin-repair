@@ -35,12 +35,25 @@ Preferred repair order:
 If plugin state is healthy but Browser or Computer Use cannot initialize, compare AppX and relocated-runtime hashes for:
 
 - `codex.exe`;
+- `codex-code-mode-host.exe`;
 - `node.exe`;
 - `node_repl.exe`;
 - `codex-command-runner.exe`;
 - `codex-windows-sandbox-setup.exe`.
 
 Also verify the current bundled `browser-client.mjs` hash is trusted when the corresponding config key exists.
+
+## Command runs but its result fails IPC decoding
+
+Representative message:
+
+```text
+failed to decode code-mode IPC frame: missing field `code_mode_host_duration_ns`
+```
+
+This can occur when the desktop AppX package is newer than the relocated `%LOCALAPPDATA%\OpenAI\Codex\bin\codex-code-mode-host.exe`. The command may already have executed; the failure occurs while the desktop app decodes the host's result frame.
+
+Compare the AppX and relocated host by SHA-256. Do not rely on `FileVersion`, which may be empty. If they differ, classify it as runtime drift, fully exit Codex, and use `-RepairRuntimeDrift`. After restarting, verify both `-InspectOnly` and one minimal shell command.
 
 ## Missing client script
 

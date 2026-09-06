@@ -46,6 +46,12 @@ if ([string]::IsNullOrWhiteSpace($report.CodexHome.Canonical)) {
 if ($null -eq $report.Runtime.Files -or $report.Runtime.Files.Count -lt 1) {
     throw "Runtime file checks were not reported."
 }
+$runtimeFileNames = @($report.Runtime.Files | ForEach-Object { $_.Name })
+foreach ($requiredRuntimeFile in @("codex.exe", "codex-code-mode-host.exe", "node_repl.exe", "codex-command-runner.exe")) {
+    if ($requiredRuntimeFile -notin $runtimeFileNames) {
+        throw "Required runtime file check is missing: $requiredRuntimeFile"
+    }
+}
 if ($null -eq $report.Recommendations -or $report.Recommendations.Count -lt 1) {
     throw "Recommendations were not reported."
 }

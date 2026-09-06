@@ -17,6 +17,7 @@ Windows 版 Codex Desktop 更新、运行时文件迁移或 Codex 数据目录�
 - 日志出现 `openai-bundled` 为保留市场、无法从当前来源添加；
 - 插件显示已启用，但 Browser 或 Computer Use 初始化失败；
 - Codex 更新后，本地 `codex.exe`、`node_repl.exe` 或辅助程序仍是旧版本；
+- 命令已经执行，但结果返回时出现 code-mode IPC 解码错误，例如缺少 `code_mode_host_duration_ns` 字段；
 - `%USERPROFILE%\.codex` 是指向其他磁盘的 junction。
 
 不适合普通第三方插件安装、非 Windows 系统或单纯的网页故障。
@@ -27,6 +28,7 @@ Windows 版 Codex Desktop 更新、运行时文件迁移或 Codex 数据目录�
 - 识别 lexical/canonical `CODEX_HOME` 不一致；
 - 检查 `openai-bundled` 配置源和物化目录；
 - 比较当前 AppX 与迁移后运行时的 SHA-256；
+- 覆盖可能缺少 Windows 文件版本信息的 `codex-code-mode-host.exe`；
 - 按需持久化正确的 `CODEX_HOME`；
 - 只修复 `config.toml` 中的内置市场段落；
 - 只备份、替换发生漂移的运行时文件；

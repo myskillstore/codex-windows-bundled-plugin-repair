@@ -239,6 +239,7 @@ $marketplaceSourceMismatch = $null -ne $configuredMarketplaceSource -and
 
 $runtimeSources = @(
     [pscustomobject]@{ Name = "codex.exe"; RelativeSource = "codex.exe" },
+    [pscustomobject]@{ Name = "codex-code-mode-host.exe"; RelativeSource = "codex-code-mode-host.exe" },
     [pscustomobject]@{ Name = "node.exe"; RelativeSource = "cua_node\bin\node.exe" },
     [pscustomobject]@{ Name = "node_repl.exe"; RelativeSource = "cua_node\bin\node_repl.exe" },
     [pscustomobject]@{ Name = "codex-command-runner.exe"; RelativeSource = "codex-command-runner.exe" },
@@ -263,6 +264,7 @@ foreach ($runtimeSource in $runtimeSources) {
     }
 }
 $runtimeDrift = @($runtimeRows | Where-Object { $_.SourceExists -and -not $_.Matches }).Count -gt 0
+$runtimeDriftNames = @($runtimeRows | Where-Object { $_.SourceExists -and -not $_.Matches } | ForEach-Object { $_.Name })
 $configContentForInspection = if (Test-Path -LiteralPath $configPath -PathType Leaf) {
     Get-Content -LiteralPath $configPath -Raw -Encoding UTF8
 }
@@ -540,6 +542,9 @@ Write-Output "  Marketplace mismatch:  $marketplaceSourceMismatch"
 Write-Output "  Marketplace visible:   $cliMarketplaceSeen"
 Write-Output "  Runtime drift:         $runtimeDrift"
 Write-Output "  Runtime repair needed: $runtimeDriftActionable"
+if ($runtimeDriftNames.Count -gt 0) {
+    Write-Output "  Runtime drift files:   $($runtimeDriftNames -join ', ')"
+}
 Write-Output "  Enabled bundled:       $($enabledBundledPlugins -join ', ')"
 if ($null -ne $cliError) {
     Write-Output "  CLI inspection error:  $cliError"

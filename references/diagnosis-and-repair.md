@@ -11,6 +11,7 @@ Determine all of the following independently:
 - the canonical path after resolving a junction or symbolic link;
 - the newest installed `OpenAI.Codex` AppX package;
 - the active relocated runtime under `%LOCALAPPDATA%\OpenAI\Codex\bin`;
+- the AppX and relocated copies of `codex-code-mode-host.exe`;
 - the materialized bundled marketplace under `<CODEX_HOME>\.tmp\bundled-marketplaces\openai-bundled`.
 
 Do not assume two paths are equivalent merely because Windows Explorer reaches the same files through both. Newer Codex plugin validation can compare a reserved marketplace against the active Codex home before accepting it.
@@ -73,6 +74,9 @@ Typical evidence:
 - one or more hashes differ between the current AppX resources and `%LOCALAPPDATA%\OpenAI\Codex\bin`;
 - Browser or Computer Use setup fails even though the plugins are installed;
 - `node_repl`, the command runner, or the Windows sandbox setup helper is missing or stale after an update.
+- a shell command visibly executes or produces output, but the tool result fails to decode because a field such as `code_mode_host_duration_ns` is missing.
+
+The runtime comparison must include `codex-code-mode-host.exe`. Its AppX source is normally `app\resources\codex-code-mode-host.exe`, and its relocated destination is `%LOCALAPPDATA%\OpenAI\Codex\bin\codex-code-mode-host.exe`. Compare SHA-256 hashes rather than file versions because these binaries may not expose Windows version metadata.
 
 Fully exit Codex first, then run from a separate PowerShell window:
 
@@ -98,6 +102,7 @@ After restart:
 2. Confirm `browser@openai-bundled`, `chrome@openai-bundled`, and `computer-use@openai-bundled` are installed and enabled when available for the current account/build.
 3. Open a fresh Codex task because an existing task's capability catalog can remain stale.
 4. If explicitly requested, open a harmless page with Browser and report its title and URL.
+5. Run one minimal shell command and confirm its result returns normally without a code-mode IPC decode error.
 
 Stop after two repair-and-restart cycles with the same failure. Preserve the latest small backup and report the exact remaining evidence rather than broadening the mutation scope.
 

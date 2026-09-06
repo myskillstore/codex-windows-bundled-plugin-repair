@@ -17,6 +17,7 @@ Use it when:
 - logs say that `openai-bundled` is reserved and cannot be added from the submitted source;
 - plugins are enabled but Browser or Computer Use cannot initialize;
 - local `codex.exe`, `node_repl.exe`, or helper binaries remain stale after an update;
+- commands execute but their results fail with a code-mode IPC decode error such as a missing `code_mode_host_duration_ns` field;
 - `%USERPROFILE%\.codex` is a junction to another volume.
 
 It is not intended for ordinary third-party plugin installation, non-Windows systems, or general website failures.
@@ -27,6 +28,7 @@ It is not intended for ordinary third-party plugin installation, non-Windows sys
 - Detects lexical/canonical `CODEX_HOME` mismatches.
 - Checks the `openai-bundled` configured and materialized paths.
 - Compares SHA-256 hashes for the current AppX and relocated runtime.
+- Includes `codex-code-mode-host.exe`, which may not expose useful Windows file-version metadata.
 - Can persist the correct canonical `CODEX_HOME`.
 - Can repair only the bundled-marketplace section in `config.toml`.
 - Backs up and replaces only runtime files that have drifted.
