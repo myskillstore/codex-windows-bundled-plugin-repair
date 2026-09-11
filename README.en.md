@@ -7,15 +7,16 @@ Codex Windows Bundled Plugin Repair is a Codex skill for diagnosing and safely r
 
 ## Why this exists
 
-After a Codex Desktop update, runtime relocation, or a junctioned Codex data directory, bundled tools such as Browser, Chrome, and Computer Use can disappear from both the UI and new task capability catalogs. The plugin files may still exist, while restarts or repeated per-plugin installs do not address the root cause. Registering the reserved marketplace from the wrong path can make the failure broader.
+After a Codex Desktop update, runtime relocation, or a junctioned Codex data directory, bundled tools such as Browser, Chrome, and Computer Use can disappear from both the UI and new task capability catalogs. Another easily misclassified case is a browser page that is visibly open while the current task cannot enumerate or control its tab: creation may have succeeded even though the automation handle was never returned or has gone stale. Restarting, opening duplicate tabs, or repeatedly reinstalling one plugin may not address the root cause and can make diagnosis noisier or broaden a reserved-marketplace failure.
 
-This skill turns the repair into an evidence-driven sequence: compare the lexical and canonical Codex data paths, validate the reserved marketplace, compare the current AppX bundle with relocated runtime hashes, and apply only the smallest supported mutation. It does not take ownership of `WindowsApps`, reset the whole `.codex` directory, or create multi-gigabyte plugin-cache backups by default.
+This skill turns the repair into an evidence-driven sequence: first distinguish page rendering from automation control and try to enumerate and reattach the existing tab; only then compare lexical and canonical Codex data paths, validate the reserved marketplace, compare the current AppX bundle with relocated runtime hashes, and apply the smallest supported mutation. It does not take ownership of `WindowsApps`, reset the whole `.codex` directory, or create multi-gigabyte plugin-cache backups by default.
 
 Use it when:
 
 - several bundled plugins disappear together, including Browser, Chrome, Computer Use, Sites, or Visualize;
 - logs say that `openai-bundled` is reserved and cannot be added from the submitted source;
 - plugins are enabled but Browser or Computer Use cannot initialize;
+- a browser page is visible but the current task cannot read its DOM, capture it, or interact with it;
 - local `codex.exe`, `node_repl.exe`, or helper binaries remain stale after an update;
 - commands execute but their results fail with a code-mode IPC decode error such as a missing `code_mode_host_duration_ns` field;
 - `%USERPROFILE%\.codex` is a junction to another volume.
@@ -25,6 +26,7 @@ It is not intended for ordinary third-party plugin installation, non-Windows sys
 ## Capabilities
 
 - Read-only inspection by default.
+- Distinguishes a visible page from an attached automation handle and recovers existing tabs first.
 - Detects lexical/canonical `CODEX_HOME` mismatches.
 - Checks the `openai-bundled` configured and materialized paths.
 - Compares SHA-256 hashes for the current AppX and relocated runtime.
@@ -82,7 +84,7 @@ powershell -ExecutionPolicy Bypass -File "<skill-dir>\scripts\Repair-CodexBundle
 powershell -ExecutionPolicy Bypass -File "<skill-dir>\scripts\Repair-CodexBundledPlugins.ps1" -RepairRuntimeDrift
 ```
 
-See [Diagnosis and Repair Method](references/diagnosis-and-repair.md) for the full decision process and stopping condition.
+When a page is visible but uncontrollable, start with [Browser Control Handle Recovery](references/browser-control-recovery.md). See [Diagnosis and Repair Method](references/diagnosis-and-repair.md) for the full installation decision process and stopping condition.
 
 ## Safety boundaries
 

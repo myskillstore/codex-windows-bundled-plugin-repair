@@ -7,15 +7,16 @@ Codex Windows Bundled Plugin Repair is a Codex skill for diagnosing and safely r
 
 ## 为什么需要它
 
-Windows 版 Codex Desktop 更新、运行时文件迁移或 Codex 数据目录使用 junction 后，Browser、Chrome、Computer Use 等 `openai-bundled` 插件可能同时从界面和新任务的能力列表中消失。插件目录明明存在，简单重启或反复安装单个插件却无法解决问题，还可能因为错误注册保留市场而扩大故障。
+Windows 版 Codex Desktop 更新、运行时文件迁移或 Codex 数据目录使用 junction 后，Browser、Chrome、Computer Use 等 `openai-bundled` 插件可能同时从界面和新任务的能力列表中消失。另一种容易误判的情况是浏览器页面明明已经显示，但当前任务无法枚举或控制标签页：页面创建可能成功了，只是自动化句柄没有返回或已经失效。简单重启、重复开页或反复安装单个插件不仅不一定解决问题，还可能制造重复标签页或因错误注册保留市场而扩大故障。
 
-本 Skill 把处理过程改成可验证的顺序：先比较 Codex 数据目录的表面路径与真实路径，再核对保留市场、当前 AppX 包和本地运行时哈希，最后只执行有证据支持的最小修复。它不会接管 `WindowsApps`、重置整个 `.codex` 目录，或默认备份数 GB 的完整插件缓存。
+本 Skill 把处理过程改成可验证的顺序：先区分页面渲染状态与自动化控制状态，优先枚举并重新附着已有标签页；仍失败时再比较 Codex 数据目录的表面路径与真实路径，核对保留市场、当前 AppX 包和本地运行时哈希，最后只执行有证据支持的最小修复。它不会接管 `WindowsApps`、重置整个 `.codex` 目录，或默认备份数 GB 的完整插件缓存。
 
 适合以下情况：
 
 - Browser、Chrome、Computer Use、Sites、Visualize 等内置插件同时消失；
 - 日志出现 `openai-bundled` 为保留市场、无法从当前来源添加；
 - 插件显示已启用，但 Browser 或 Computer Use 初始化失败；
+- 浏览器页面已显示，但当前任务无法读取 DOM、截图或执行交互；
 - Codex 更新后，本地 `codex.exe`、`node_repl.exe` 或辅助程序仍是旧版本；
 - 命令已经执行，但结果返回时出现 code-mode IPC 解码错误，例如缺少 `code_mode_host_duration_ns` 字段；
 - `%USERPROFILE%\.codex` 是指向其他磁盘的 junction。
@@ -25,6 +26,7 @@ Windows 版 Codex Desktop 更新、运行时文件迁移或 Codex 数据目录�
 ## 核心能力
 
 - 默认只读检查，不直接修改系统；
+- 区分“页面已经打开”和“控制句柄已经附着”，优先恢复现有标签页；
 - 识别 lexical/canonical `CODEX_HOME` 不一致；
 - 检查 `openai-bundled` 配置源和物化目录；
 - 比较当前 AppX 与迁移后运行时的 SHA-256；
@@ -82,7 +84,7 @@ powershell -ExecutionPolicy Bypass -File "<skill-dir>\scripts\Repair-CodexBundle
 powershell -ExecutionPolicy Bypass -File "<skill-dir>\scripts\Repair-CodexBundledPlugins.ps1" -RepairRuntimeDrift
 ```
 
-完整方法与停止条件见 [诊断和修复方法](references/diagnosis-and-repair.md)。
+页面可见但无法控制时，先使用[浏览器控制句柄恢复方法](references/browser-control-recovery.md)。完整安装诊断、修复方法与停止条件见[诊断和修复方法](references/diagnosis-and-repair.md)。
 
 ## 安全边界
 

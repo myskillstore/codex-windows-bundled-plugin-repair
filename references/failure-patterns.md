@@ -2,6 +2,12 @@
 
 Use these patterns to classify evidence after the standard inspection.
 
+## Page is visible but Codex cannot control it
+
+This is not sufficient evidence that Browser or Computer Use failed to open. A create/open request may have completed in the desktop UI while the task-local automation handle timed out or became stale.
+
+Before running any repair, follow [browser-control-recovery.md](browser-control-recovery.md): initialize the current control entry point, enumerate existing tabs, reattach by current tab ID, verify URL/DOM read-only, then reset the control session once if necessary. Escalate to `-InspectOnly` only when attachment still fails in a fresh task or the expected browser surface is absent.
+
 ## Bundled plugins disappear together
 
 Strong signal: Browser, Chrome, Computer Use, Sites, and Visualize disappear at the same time.

@@ -18,6 +18,8 @@ Do not assume two paths are equivalent merely because Windows Explorer reaches t
 
 ## 2. Inspect before repairing
 
+If the browser page is visibly open and only automation control is failing, first follow [browser-control-recovery.md](browser-control-recovery.md). That workflow is read-only and can recover a stale tab handle without changing the Codex installation. Run the inspection below when the browser surface is absent, reattachment remains broken in a fresh task, or evidence points to marketplace/runtime drift.
+
 Run:
 
 ```powershell
@@ -102,6 +104,7 @@ After restart:
 2. Confirm `browser@openai-bundled`, `chrome@openai-bundled`, and `computer-use@openai-bundled` are installed and enabled when available for the current account/build.
 3. Open a fresh Codex task because an existing task's capability catalog can remain stale.
 4. If explicitly requested, open a harmless page with Browser and report its title and URL.
+   If a page is already visible, enumerate and reattach that tab before creating another one; verify DOM or screenshot before attempting a harmless interaction.
 5. Run one minimal shell command and confirm its result returns normally without a code-mode IPC decode error.
 
 Stop after two repair-and-restart cycles with the same failure. Preserve the latest small backup and report the exact remaining evidence rather than broadening the mutation scope.
