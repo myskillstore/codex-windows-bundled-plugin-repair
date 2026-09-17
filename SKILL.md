@@ -36,6 +36,8 @@ Restore the current Codex Desktop bundle without resetting unrelated user state.
 
 3. Restart Codex Desktop after a repair.
 
+   For a pre-start update gate, use `-InspectOnly -SkipCliInspection -Json` to compare files without launching CLI or Desktop. `-RepairRuntimeDrift -SkipCliInspection` is compatible with the update skill's authorized synchronization workflow. Skipped CLI checks are unknown, not failed or verified; plugin materialization and browser connectivity still require a fresh task after startup.
+
 4. Open a fresh task and verify that the Browser and Computer Use skills are present. When the user asks for an interaction test, use the current Browser or Computer Use entry point, enumerate tabs before creating another one, and verify URL/DOM before a harmless interaction; otherwise keep verification read-only.
 
 ## Interpretation

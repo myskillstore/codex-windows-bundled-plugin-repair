@@ -34,6 +34,8 @@ powershell -ExecutionPolicy Bypass -File "<skill-dir>\scripts\Repair-CodexBundle
 
 The inspection is intentionally local and read-only. It does not dump the contents of `config.toml`, global state, task history, or logs.
 
+For post-update inspection before Desktop starts, add `-SkipCliInspection -Json`. This skips both CLI plugin-list commands; `Marketplace.CliInspectionSkipped` is true and `CliListsBundledMarketplace` is null. File hashes, existing paths, and manifests remain available. Missing materialized caches before startup are not proof of plugin failure. The update skill can orchestrate inspection, authorized runtime-only synchronization, and an independent second inspection; only configured relocated-runtime drift is automatically eligible. Do not use `-RepairAll` as an update hook. Repair reports now rehash destinations after synchronization, but always run a separate inspection as the final gate.
+
 ## 3. Repair a CODEX_HOME canonical-path mismatch
 
 Typical evidence:

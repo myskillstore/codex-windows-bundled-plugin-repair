@@ -6,6 +6,7 @@ param(
     [switch]$RepairRuntimeDrift,
     [switch]$RepairAll,
     [switch]$Json,
+    [switch]$SkipCliInspection,
     [string]$CodexHomePath
 )
 
@@ -309,7 +310,10 @@ if (-not (Test-Path -LiteralPath $cliPath -PathType Leaf)) {
 $cliMarketplaceSeen = $false
 $enabledBundledPlugins = @()
 $cliError = $null
-if (Test-Path -LiteralPath $cliPath -PathType Leaf) {
+if ($SkipCliInspection) {
+    $cliMarketplaceSeen = $null
+}
+elseif (Test-Path -LiteralPath $cliPath -PathType Leaf) {
     $previousProcessCodexHome = $env:CODEX_HOME
     try {
         $env:CODEX_HOME = $canonicalCodexHome
@@ -472,6 +476,17 @@ if ($RepairRuntimeDrift) {
     }
 }
 
+if ($RepairRuntimeDrift) {
+    foreach ($row in $runtimeRows) {
+        $row.DestinationHash = Get-FileSha256 -Path $row.Destination
+        $row.DestinationExists = $null -ne $row.DestinationHash
+        $row.Matches = $row.SourceExists -and $row.SourceHash -eq $row.DestinationHash
+    }
+    $runtimeDriftNames = @($runtimeRows | Where-Object { $_.SourceExists -and -not $_.Matches } | ForEach-Object { $_.Name })
+    $runtimeDrift = $runtimeDriftNames.Count -gt 0
+    $runtimeDriftActionable = $runtimeDrift -and $relocatedRuntimeConfigured
+}
+
 $recommendations = @()
 if ($codexHomeNeedsRepair) {
     $recommendations += "Persist the canonical Codex data path with -RepairCodexHome."
@@ -482,7 +497,7 @@ if ($marketplaceSourceMismatch) {
 if ($runtimeDriftActionable) {
     $recommendations += "Fully exit Codex and run -RepairRuntimeDrift."
 }
-if (-not $cliMarketplaceSeen) {
+if (-not $SkipCliInspection -and -not $cliMarketplaceSeen) {
     $recommendations += "The Codex CLI does not currently list openai-bundled under the canonical home."
 }
 if ($recommendations.Count -eq 0) {
@@ -507,6 +522,7 @@ $report = [ordered]@{
         NeedsRepair = $codexHomeNeedsRepair
     }
     Marketplace = [ordered]@{
+        CliInspectionSkipped = [bool]$SkipCliInspection
         ConfiguredSource = $configuredMarketplaceSource
         ExpectedMaterializedSource = $materializedRoot
         MaterializedManifestExists = Test-Path -LiteralPath $materializedManifest -PathType Leaf

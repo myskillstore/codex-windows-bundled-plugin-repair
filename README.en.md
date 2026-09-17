@@ -1,5 +1,9 @@
 # Codex Windows Bundled Plugin Repair
 
+## Static pre-start inspection
+
+Use `-InspectOnly -SkipCliInspection -Json` to check paths, manifests, and runtime hashes without starting CLI or Desktop. Skipped CLI results are unknown, not proof of plugin loading. The update skill can orchestrate authorized runtime-only synchronization after registration; do not use `-RepairAll` as an update hook. See [diagnosis and repair](references/diagnosis-and-repair.md).
+
 Codex Windows Bundled Plugin Repair 是一个用于诊断和安全修复 Windows 版 Codex Desktop 内置插件消失或失效问题的 Codex Skill。
 Codex Windows Bundled Plugin Repair is a Codex skill for diagnosing and safely repairing missing or broken bundled plugins in Codex Desktop for Windows.
 

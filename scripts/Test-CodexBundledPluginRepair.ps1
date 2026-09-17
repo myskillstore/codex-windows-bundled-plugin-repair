@@ -61,6 +61,16 @@ foreach ($path in $watchedFiles) {
         throw "Inspect-only mode modified config.toml."
     }
 }
+$staticJson = & powershell -NoProfile -ExecutionPolicy Bypass -File $scriptPath -InspectOnly -SkipCliInspection -Json
+if ($LASTEXITCODE -ne 0) { throw 'Pre-start static inspection failed.' }
+$staticReport = $staticJson | Out-String | ConvertFrom-Json
+if (-not $staticReport.Marketplace.CliInspectionSkipped -or $null -ne $staticReport.Marketplace.CliListsBundledMarketplace) {
+    throw 'Skipped CLI inspection was incorrectly represented as verified or failed.'
+}
+if ($staticReport.Runtime.Files.Count -ne $report.Runtime.Files.Count) { throw 'Static mode omitted runtime checks.' }
+foreach ($path in $watchedFiles) {
+    if ($hashesBefore[$path] -ne (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash) { throw 'Static inspection modified config.toml.' }
+}
 foreach ($name in $userEnvironmentBefore.Keys) {
     $valueAfter = [Environment]::GetEnvironmentVariable($name, "User")
     if ($userEnvironmentBefore[$name] -ne $valueAfter) {

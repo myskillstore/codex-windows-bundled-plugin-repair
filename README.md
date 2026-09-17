@@ -1,5 +1,9 @@
 # Codex Windows Bundled Plugin Repair
 
+## 启动前静态检查
+
+新增 `-SkipCliInspection`：与 `-InspectOnly -Json` 合用时只检查路径、manifest 和运行时哈希，不启动 CLI 或 Desktop。跳过的 CLI 项目是未知状态，不代表插件已加载。可由更新 Skill 在新版注册后编排授权的运行时同步；不要用 `-RepairAll` 作为更新钩子。详见 [诊断与修复](references/diagnosis-and-repair.md)。
+
 Codex Windows Bundled Plugin Repair 是一个用于诊断和安全修复 Windows 版 Codex Desktop 内置插件消失或失效问题的 Codex Skill。
 Codex Windows Bundled Plugin Repair is a Codex skill for diagnosing and safely repairing missing or broken bundled plugins in Codex Desktop for Windows.
 
