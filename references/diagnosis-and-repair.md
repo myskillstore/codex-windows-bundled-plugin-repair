@@ -1,5 +1,9 @@
 # Diagnosis and Repair Method
 
+## Package registration and elevation boundary
+
+If a Desktop update reports `0x80073D28` requiring administrator privileges for a packaged `windows.service` (possibly wrapped in `0x80073CF6`), resolve package registration first, preferably through `codex-windows-update-repair` when installed. Hand off one explicitly authorized elevated registration attempt from a standalone terminal under the same Windows account. This does not make routine plugin inspection or user-scoped runtime/config/environment repair require Administrator. Do not switch users, self-elevate, alter WindowsApps ACLs, or treat sandbox/browser permission denial as plugin corruption. After successful registration, recheck AppX version, runtime hashes, and fresh-task browser control before claiming recovery.
+
 Read this reference before changing Codex Desktop state.
 
 ## 1. Establish the active paths

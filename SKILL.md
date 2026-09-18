@@ -9,6 +9,8 @@ Restore the current Codex Desktop bundle without resetting unrelated user state.
 
 ## Non-negotiable gates
 
+- A Desktop update failing with packaged-service error `0x80073D28` is a package-registration problem, not evidence of bundled-plugin corruption. Route it to `codex-windows-update-repair` when available; see the diagnosis reference for the elevation boundary. Do not use `-RepairAll`, alter ACLs, or require elevation for routine user-scoped inspection/runtime repair on this evidence alone.
+
 - Start with read-only inspection. Run `scripts/Repair-CodexBundledPlugins.ps1 -InspectOnly` before proposing a mutation.
 - Treat the newest installed `OpenAI.Codex` AppX package as the source of truth for bundled plugins and runtime binaries.
 - Include `codex-code-mode-host.exe` in runtime drift checks. A stale copy can execute a command but fail while returning its result, for example with a missing `code_mode_host_duration_ns` field.
