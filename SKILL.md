@@ -20,6 +20,7 @@ Restore the current Codex Desktop bundle without resetting unrelated user state.
 - Obtain user authorization immediately before changing user environment variables, `config.toml`, runtime executables, registry entries, or running processes. A request to diagnose is not repair authorization.
 - Do not stop Codex automatically. If runtime files are locked, ask the user to fully exit Codex and run the repair command from PowerShell.
 - A visible browser page does not prove that its automation handle is attached. When the page is visible but control calls time out, read [references/browser-control-recovery.md](references/browser-control-recovery.md) and attempt the non-mutating reattachment workflow before classifying the bundled plugin as broken or proposing a repair.
+- If the top-level browser inventory fails or omits a visibly open tab, continue with the browser-object inventory fallback in the recovery reference before creating another tab.
 
 ## Workflow
 

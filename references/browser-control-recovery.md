@@ -24,10 +24,52 @@ A timed-out open/create call can be ambiguous: the desktop app may have complete
 
 These steps do not authorize edits to `config.toml`, environment variables, runtime files, registry entries, extensions, or running processes.
 
+## Browser-object inventory fallback
+
+Use this fallback when a page is visibly open but `cua.getState()` or `cua.listTabs()` times out, returns `nodeRepl.fetch request failed`, returns an empty or incomplete inventory, or a top-level `cua.getTab({ url })` lookup reports that the tab was not found. These failures can belong to the top-level adapter while the browser-scoped API remains healthy.
+
+1. Select the expected browser without opening a tab. For an in-app Browser target with a known URL, use the current API equivalent of:
+
+   ```javascript
+   let browser = await cua.getBrowser({ url: targetUrl });
+   ```
+
+   Respect an explicitly selected browser. Use the browser ID returned by the current documentation rather than assuming that the string `"iab"` is the active browser ID.
+
+2. Enumerate tabs through the selected browser object:
+
+   ```javascript
+   let tabs = await browser.tabs.list();
+   ```
+
+3. Match the target from the returned `id`, `providerTabId`, `title`, and normalized URL. If exactly one match exists, bind it through the browser object:
+
+   ```javascript
+   let tab = await browser.tabs.get(match.id);
+   ```
+
+4. Verify the recovered handle with the browser-scoped API:
+
+   ```javascript
+   let evidence = {
+     id: tab.id,
+     url: await tab.url(),
+     title: await tab.title(),
+     dom: (await tab.playwright.domSnapshot()).slice(0, 1200),
+   };
+   ```
+
+   A matching URL/title plus page-specific DOM or screenshot evidence is sufficient. Do not perform extra interactions merely to prove control.
+
+5. If inventory confirms that the target does not exist, create one tab with `browser.tabs.new()` and navigate it once. If creation or navigation times out after a visible page appears, treat the result as ambiguous: reset the CUA session once, reacquire the browser using the required first-call entry point, and repeat `browser.tabs.list()` before creating anything else.
+
+6. Call `tab.markDeliverable()` only when the user wants the page to remain available after the turn. Otherwise preserve the normal temporary-tab lifecycle.
+
 ## Classification after recovery attempts
 
 | Evidence | Classification | Next action |
 | --- | --- | --- |
+| Top-level inventory fails, browser-object inventory lists the tab, and `browser.tabs.get(id)` succeeds | Top-level adapter failure with healthy browser-scoped control | Continue through the recovered handle; no plugin repair |
 | Page visible, tab listed, reattachment succeeds | Stale or lost task-local handle | Continue QA; no plugin repair |
 | Page visible, tab listed, reattachment fails twice | Control-session or runtime binding failure | Open a fresh task; then run `-InspectOnly` if it persists |
 | Page visible, tab absent from the expected browser inventory | Surface/provider inventory mismatch | Recheck selected browser, reset once, then restart Codex if needed |
